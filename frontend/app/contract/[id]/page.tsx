@@ -75,9 +75,26 @@ export default function ContractPage() {
     }
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert('링크가 복사되었습니다.');
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      alert('링크가 복사되었습니다.');
+    } catch (err) {
+      const textArea = document.createElement('textarea');
+      textArea.value = window.location.href;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert('링크가 복사되었습니다.');
+      } catch (fallbackErr) {
+        alert('링크 복사에 실패했습니다. 수동으로 복사해주세요.');
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   const handleVerify = async () => {
@@ -107,15 +124,29 @@ export default function ContractPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>로딩 중...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-verification-cyan/30 border-t-verification-cyan rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white font-medium">계약서 로딩 중...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !contract) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600">{error || '계약서를 찾을 수 없습니다.'}</p>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="glass-card p-8 text-center max-w-md">
+          <div className="text-6xl mb-4">⚠️</div>
+          <p className="text-red-400 font-semibold text-lg mb-2">
+            {error || '계약서를 찾을 수 없습니다.'}
+          </p>
+          <a
+            href="/"
+            className="inline-block mt-4 px-6 py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold rounded-xl hover:shadow-lg transition-all"
+          >
+            홈으로 돌아가기
+          </a>
+        </div>
       </div>
     );
   }
@@ -124,264 +155,398 @@ export default function ContractPage() {
   const isCompleted = contract.status === 'COMPLETED';
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          {/* 헤더 */}
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-xl font-bold">표준 근로계약서</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                계약 ID: {contract.id.slice(0, 8)}...
-              </p>
-            </div>
+    <main className="min-h-screen relative py-12 px-4">
+      {/* Background decorations */}
+      <div className="fixed top-10 right-5 w-72 h-72 border border-emerald-400/30 rounded-full" style={{ animation: 'float 8s ease-in-out infinite' }} />
+      <div className="fixed bottom-10 left-5 w-56 h-56 border border-cyan-400/30 rotate-45" style={{ animation: 'float 10s ease-in-out infinite reverse' }} />
+
+      <div className="max-w-5xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <a
+              href="/"
+              className="text-white hover:text-cyan-300 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </a>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-verification-cyan to-blockchain-green bg-clip-text text-transparent">
+              근로계약서
+            </h1>
+          </div>
+          <div className="flex items-center justify-center gap-4 text-sm">
+            <span className="font-mono text-cyan-200">
+              ID: {contract.id.slice(0, 12)}...
+            </span>
             <span
-              className={`px-3 py-1 rounded-full text-sm ${
+              className={`px-4 py-1.5 rounded-full font-bold ${
                 isCompleted
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-yellow-100 text-yellow-800'
+                  ? 'bg-emerald-500 text-white border-2 border-emerald-400'
+                  : 'bg-amber-500 text-white border-2 border-amber-400'
               }`}
             >
               {STATUS_LABEL[contract.status]}
             </span>
           </div>
+        </div>
 
-          {/* 계약 유형 */}
-          <div className="mb-6">
-            <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm">
-              {CONTRACT_TYPE_LABEL[contract.contractType]}
-            </span>
+        {/* Main Content Card */}
+        <div className="glass-card p-8 lg:p-12 mb-8">
+          {/* Contract Type Badge */}
+          <div className="mb-8 flex justify-center">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-100 to-emerald-100 border-2 border-cyan-400">
+              <span className="text-2xl">
+                {contract.contractType === 'REGULAR' ? '💼' : contract.contractType === 'PARTTIME' ? '⏰' : '📅'}
+              </span>
+              <span className="font-bold text-lg text-gray-800">
+                {CONTRACT_TYPE_LABEL[contract.contractType]}
+              </span>
+            </div>
           </div>
 
-          {/* 고용주 정보 */}
-          <section className="mb-6">
-            <h2 className="font-medium text-gray-700 border-b pb-2 mb-3">고용주</h2>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <span className="text-gray-500">상호명:</span> {contract.employerName}
+          {/* Two-column layout for parties */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {/* Employer */}
+            <section className="relative">
+              <div className="absolute -top-2 -left-2 w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center text-white font-bold shadow-lg">
+                A
               </div>
-              <div>
-                <span className="text-gray-500">대표자:</span> {contract.employerCeo}
+              <div className="pl-10">
+                <h2 className="text-lg font-bold text-gray-900 mb-4 tracking-wide">고용주</h2>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between py-2 border-b border-glass-border">
+                    <span className="text-gray-800 font-bold">상호명</span>
+                    <span className="text-gray-900 font-bold">{contract.employerName}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-glass-border">
+                    <span className="text-gray-800 font-bold">대표자</span>
+                    <span className="text-gray-900 font-bold">{contract.employerCeo}</span>
+                  </div>
+                  <div className="py-2 border-b border-glass-border">
+                    <span className="text-gray-800 font-bold block mb-1">주소</span>
+                    <span className="text-crystal-white text-xs">{contract.employerAddress}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-800 font-bold">연락처</span>
+                    <span className="text-crystal-white font-mono font-semibold">{contract.employerPhone}</span>
+                  </div>
+                </div>
               </div>
-              <div className="col-span-2">
-                <span className="text-gray-500">주소:</span> {contract.employerAddress}
+            </section>
+
+            {/* Worker */}
+            <section className="relative">
+              <div className="absolute -top-2 -left-2 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold shadow-lg">
+                B
               </div>
-              <div>
-                <span className="text-gray-500">연락처:</span> {contract.employerPhone}
+              <div className="pl-10">
+                <h2 className="text-lg font-bold text-gray-900 mb-4 tracking-wide">근로자</h2>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between py-2 border-b border-glass-border">
+                    <span className="text-gray-800 font-bold">이름</span>
+                    <span className="text-gray-900 font-bold">{contract.workerName}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-glass-border">
+                    <span className="text-gray-800 font-bold">생년월일</span>
+                    <span className="text-crystal-white font-mono font-semibold">{contract.workerBirth}</span>
+                  </div>
+                  <div className="py-2 border-b border-glass-border">
+                    <span className="text-gray-800 font-bold block mb-1">주소</span>
+                    <span className="text-crystal-white text-xs">{contract.workerAddress}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-800 font-bold">연락처</span>
+                    <span className="text-crystal-white font-mono font-semibold">{contract.workerPhone}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Work Conditions */}
+          <section className="mb-8 pt-8 border-t-2 border-glass-border">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white font-bold shadow-lg">
+                C
+              </div>
+              <h2 className="text-lg font-bold text-gray-900 tracking-wide">근무 조건</h2>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">계약 기간</div>
+                <div className="text-gray-900 font-bold">
+                  {new Date(contract.startDate).toLocaleDateString('ko-KR')}
+                  <span className="mx-2 text-gray-500">~</span>
+                  {contract.endDate ? new Date(contract.endDate).toLocaleDateString('ko-KR') : '무기한'}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">근무 요일</div>
+                <div className="text-gray-900 font-bold">
+                  {contract.workDays.join(', ')}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">근무 시간</div>
+                <div className="text-crystal-white font-mono font-semibold">
+                  {contract.workStart} - {contract.workEnd}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">휴게시간</div>
+                <div className="text-gray-900 font-bold">
+                  {contract.breakTime}분
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">시급</div>
+                <div className="text-emerald-400 font-bold text-lg font-mono">
+                  ₩{contract.hourlyWage.toLocaleString()}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">급여일</div>
+                <div className="text-gray-900 font-bold">
+                  매월 {contract.payDay}일
+                </div>
               </div>
             </div>
           </section>
 
-          {/* 근로자 정보 */}
-          <section className="mb-6">
-            <h2 className="font-medium text-gray-700 border-b pb-2 mb-3">근로자</h2>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <span className="text-gray-500">이름:</span> {contract.workerName}
-              </div>
-              <div>
-                <span className="text-gray-500">생년월일:</span> {contract.workerBirth}
-              </div>
-              <div className="col-span-2">
-                <span className="text-gray-500">주소:</span> {contract.workerAddress}
-              </div>
-              <div>
-                <span className="text-gray-500">연락처:</span> {contract.workerPhone}
-              </div>
-            </div>
-          </section>
-
-          {/* 근무 조건 */}
-          <section className="mb-6">
-            <h2 className="font-medium text-gray-700 border-b pb-2 mb-3">근무 조건</h2>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <span className="text-gray-500">계약 기간:</span>{' '}
-                {new Date(contract.startDate).toLocaleDateString('ko-KR')} ~{' '}
-                {contract.endDate
-                  ? new Date(contract.endDate).toLocaleDateString('ko-KR')
-                  : '무기한'}
-              </div>
-              <div>
-                <span className="text-gray-500">근무 요일:</span>{' '}
-                {contract.workDays.join(', ')}
-              </div>
-              <div>
-                <span className="text-gray-500">근무 시간:</span> {contract.workStart} ~{' '}
-                {contract.workEnd}
-              </div>
-              <div>
-                <span className="text-gray-500">휴게 시간:</span> {contract.breakTime}분
-              </div>
-              <div>
-                <span className="text-gray-500">시급:</span>{' '}
-                {contract.hourlyWage.toLocaleString()}원
-              </div>
-              <div>
-                <span className="text-gray-500">급여일:</span> 매월 {contract.payDay}일
-              </div>
-            </div>
-          </section>
-
-          {/* 특약 사항 */}
+          {/* Special Terms */}
           {contract.specialTerms && (
-            <section className="mb-6">
-              <h2 className="font-medium text-gray-700 border-b pb-2 mb-3">특약 사항</h2>
-              <p className="text-sm">{contract.specialTerms}</p>
+            <section className="mb-8 p-6 rounded-xl bg-gray-50 border-2 border-gray-200">
+              <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">특약 사항</h3>
+              <p className="text-gray-900 leading-relaxed">{contract.specialTerms}</p>
             </section>
           )}
 
-          {/* 서명 현황 */}
-          <section className="mb-6">
-            <h2 className="font-medium text-gray-700 border-b pb-2 mb-3">서명</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="border rounded p-3">
-                <p className="text-sm text-gray-500 mb-2">고용주 서명</p>
+          {/* Signatures */}
+          <section className="mb-8 pt-8 border-t-2 border-glass-border">
+            <h2 className="text-lg font-bold text-gray-900 mb-6 tracking-wide text-center">전자 서명</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="relative p-6 rounded-2xl bg-gray-50 border-2 border-gray-200">
+                <div className="absolute -top-3 left-6 px-3 py-1 bg-cyan-100 rounded-full border-2 border-cyan-500">
+                  <span className="text-xs font-bold text-cyan-700 uppercase tracking-wider">고용주</span>
+                </div>
                 {contract.employerSign ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={contract.employerSign}
                     alt="고용주 서명"
-                    className="h-16 object-contain"
+                    className="h-24 object-contain mx-auto filter drop-shadow-lg"
                   />
                 ) : (
-                  <p className="text-gray-400 text-sm">서명 없음</p>
+                  <div className="h-24 flex items-center justify-center text-gray-400">
+                    서명 대기 중
+                  </div>
                 )}
               </div>
-              <div className="border rounded p-3">
-                <p className="text-sm text-gray-500 mb-2">근로자 서명</p>
+              <div className="relative p-6 rounded-2xl bg-gray-50 border-2 border-gray-200">
+                <div className="absolute -top-3 left-6 px-3 py-1 bg-emerald-100 rounded-full border-2 border-emerald-500">
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">근로자</span>
+                </div>
                 {contract.workerSign ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={contract.workerSign}
                     alt="근로자 서명"
-                    className="h-16 object-contain"
+                    className="h-24 object-contain mx-auto filter drop-shadow-lg"
                   />
                 ) : (
-                  <p className="text-gray-400 text-sm">서명 없음</p>
+                  <div className="h-24 flex items-center justify-center text-gray-400">
+                    서명 대기 중
+                  </div>
                 )}
               </div>
             </div>
           </section>
 
-          {/* 블록체인 정보 */}
+          {/* Blockchain Verification Section */}
           {isCompleted && contract.solanaTxId && (
-            <section className="mb-6 bg-gray-50 rounded-lg p-4">
-              <h2 className="font-medium text-gray-700 mb-3">블록체인 검증 정보</h2>
-              <div className="text-sm space-y-2">
-                <p>
-                  <span className="text-gray-500">계약 해시:</span>{' '}
-                  <code className="text-xs bg-gray-200 px-1 rounded break-all">
-                    {contract.pdfHash}
-                  </code>
-                </p>
-                <p>
-                  <span className="text-gray-500">Solana TX:</span>{' '}
-                  <a
-                    href={`https://solscan.io/tx/${contract.solanaTxId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {contract.solanaTxId.slice(0, 20)}...
-                  </a>
-                </p>
-              </div>
+            <section className="p-8 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-700 border-2 border-emerald-400 relative overflow-hidden">
+              {/* Animated background */}
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(0, 255, 163, 0.1) 0%, transparent 50%)',
+                animation: 'blockchainPulse 3s infinite'
+              }} />
 
-              {/* 검증 버튼 */}
-              <button
-                onClick={handleVerify}
-                disabled={verifying}
-                className="mt-3 w-full bg-purple-600 text-white py-2 rounded font-medium hover:bg-purple-700 disabled:opacity-50"
-              >
-                {verifying ? '검증 중...' : '🔍 위변조 검증하기'}
-              </button>
-
-              {/* 검증 결과 */}
-              {verifyResult && (
-                <div
-                  className={`mt-3 p-3 rounded-lg ${
-                    verifyResult.isValid
-                      ? 'bg-green-100 border border-green-300'
-                      : 'bg-red-100 border border-red-300'
-                  }`}
-                >
-                  <p
-                    className={`font-medium ${
-                      verifyResult.isValid ? 'text-green-800' : 'text-red-800'
-                    }`}
-                  >
-                    {verifyResult.isValid
-                      ? '✅ 위변조되지 않은 원본 계약서입니다.'
-                      : '❌ 계약서가 위변조되었습니다!'}
-                  </p>
-                  <div className="mt-2 text-xs space-y-1">
-                    <p className={verifyResult.isValid ? 'text-green-700' : 'text-red-700'}>
-                      현재 해시:
-                    </p>
-                    <code className={`block break-all text-xs p-1 rounded ${verifyResult.isValid ? 'bg-green-200' : 'bg-red-200'}`}>
-                      {verifyResult.currentHash}
-                    </code>
-                    <p className={`mt-2 ${verifyResult.isValid ? 'text-green-700' : 'text-red-700'}`}>
-                      원본 해시:
-                    </p>
-                    <code className={`block break-all text-xs p-1 rounded ${verifyResult.isValid ? 'bg-green-200' : 'bg-red-200'}`}>
-                      {verifyResult.originalHash}
-                    </code>
-                    {!verifyResult.isValid && (
-                      <p className="text-red-800 font-medium mt-2">
-                        ⚠️ 이 계약서의 내용이 서명 후 변경되었습니다!
-                      </p>
-                    )}
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-blockchain-green/50">
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-emerald-400">블록체인 검증</h2>
+                    <p className="text-xs text-cyan-300 font-mono font-semibold">Solana Mainnet</p>
                   </div>
                 </div>
-              )}
+
+                <div className="space-y-4 mb-6">
+                  <div className="p-4 rounded-xl bg-gray-800 border-2 border-gray-600">
+                    <div className="text-xs text-cyan-300 mb-2 uppercase tracking-wider font-bold">계약 해시 (SHA-256)</div>
+                    <code className="text-xs text-emerald-400 font-mono font-bold break-all block">
+                      {contract.pdfHash}
+                    </code>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-800 border-2 border-gray-600">
+                    <div className="text-xs text-cyan-300 mb-2 uppercase tracking-wider font-bold">트랜잭션 ID</div>
+                    <a
+                      href={`https://solscan.io/tx/${contract.solanaTxId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-cyan-300 hover:text-emerald-400 transition-colors font-mono text-xs break-all underline"
+                    >
+                      {contract.solanaTxId}
+                    </a>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleVerify}
+                  disabled={verifying}
+                  className="crystal-btn w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-blockchain-green/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {verifying ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-midnight/30 border-t-midnight rounded-full animate-spin" />
+                      검증 중...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      위변조 검증하기
+                    </>
+                  )}
+                </button>
+
+                {/* Verification Result */}
+                {verifyResult && (
+                  <div
+                    className={`mt-6 p-6 rounded-xl border-2 ${
+                      verifyResult.isValid
+                        ? 'bg-emerald-50 border-emerald-400'
+                        : 'bg-red-50 border-red-400'
+                    }`}
+                    style={{
+                      animation: 'verifySuccess 0.6s ease-out'
+                    }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`text-4xl ${verifyResult.isValid ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {verifyResult.isValid ? '✅' : '❌'}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-bold text-lg mb-3 ${verifyResult.isValid ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {verifyResult.isValid
+                            ? '위변조되지 않은 원본 계약서입니다'
+                            : '계약서가 위변조되었습니다!'}
+                        </p>
+                        <div className="space-y-3 text-xs">
+                          <div className="p-3 rounded-lg bg-gray-100 border border-gray-300">
+                            <div className={`mb-1 font-semibold ${verifyResult.isValid ? 'text-emerald-700' : 'text-red-700'}`}>
+                              현재 해시:
+                            </div>
+                            <code className="text-gray-900 font-mono break-all block font-semibold">
+                              {verifyResult.currentHash}
+                            </code>
+                          </div>
+                          <div className="p-3 rounded-lg bg-gray-100 border border-gray-300">
+                            <div className={`mb-1 font-semibold ${verifyResult.isValid ? 'text-emerald-700' : 'text-red-700'}`}>
+                              원본 해시:
+                            </div>
+                            <code className="text-gray-900 font-mono break-all block font-semibold">
+                              {verifyResult.originalHash}
+                            </code>
+                          </div>
+                        </div>
+                        {!verifyResult.isValid && (
+                          <div className="mt-4 p-3 rounded-lg bg-red-100 border-2 border-red-400">
+                            <p className="text-red-700 font-bold text-sm">
+                              ⚠️ 이 계약서의 내용이 서명 후 변경되었습니다!
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </section>
           )}
 
-          {/* 근로자 서명 영역 */}
+          {/* Worker Signature Section */}
           {isWorkerSignNeeded && (
-            <section className="border-t pt-6">
-              <h2 className="font-medium mb-4">근로자 서명</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                계약 내용을 확인하고 아래에 서명해주세요.
-              </p>
+            <section className="mt-8 pt-8 border-t-2 border-glass-border">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">근로자 서명</h2>
+                <p className="text-gray-700">
+                  계약 내용을 확인하고 서명하시면 블록체인에 영구 기록됩니다
+                </p>
+              </div>
               <SignaturePad
                 onSave={(sig) => setSignature(sig)}
                 onClear={() => setSignature(null)}
               />
-              {signature && (
-                <p className="text-sm text-green-600 mt-2">서명이 저장되었습니다.</p>
-              )}
               <button
                 onClick={handleWorkerSign}
                 disabled={signing || !signature}
-                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+                className="crystal-btn w-full mt-6 bg-gradient-to-r from-amber-500 to-emerald-500 text-white py-5 rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-signature-gold/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {signing ? '처리 중...' : '서명 완료'}
+                {signing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-midnight/30 border-t-midnight rounded-full animate-spin" />
+                    블록체인 기록 중...
+                  </span>
+                ) : (
+                  '서명 완료 및 블록체인 기록 🔐'
+                )}
               </button>
             </section>
           )}
+        </div>
 
-          {/* 액션 버튼 */}
-          <div className="mt-6 space-y-3">
-            {isCompleted && (
-              <a
-                href={contractApi.getPdfUrl(id)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full text-center bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700"
-              >
-                PDF 다운로드
-              </a>
-            )}
-            <button
-              onClick={copyLink}
-              className="w-full border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50"
+        {/* Action Buttons */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {isCompleted && (
+            <a
+              href={contractApi.getPdfUrl(id)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="crystal-btn flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold text-lg hover:shadow-2xl hover:shadow-verification-cyan/30 transition-all duration-300 hover:scale-[1.02]"
             >
-              링크 복사
-            </button>
-          </div>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              PDF 다운로드
+            </a>
+          )}
+          <button
+            onClick={copyLink}
+            className="flex items-center justify-center gap-3 px-8 py-5 rounded-2xl border-2 border-gray-300 bg-white text-gray-900 font-bold text-lg hover:bg-gray-50 hover:border-cyan-400 transition-all duration-300"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            링크 복사
+          </button>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-12 text-center text-sm text-cyan-200">
+          <p className="mb-2 flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            블록체인 기반 위변조 방지 시스템
+          </p>
+          <p className="font-mono text-xs opacity-70">
+            Powered by Solana Mainnet • SHA-256 Hash
+          </p>
         </div>
       </div>
     </main>
