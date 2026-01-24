@@ -7,7 +7,12 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:3000'],
+    origin: [
+      'http://localhost:3001',
+      'http://localhost:3000',
+      'http://localhost:4001',
+      'http://dev.openbuslab.com:4001',
+    ],
     credentials: true,
   });
 
