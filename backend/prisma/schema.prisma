@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Status: DRAFT, SENT, SIGNED, COMPLETED
+// ContractType: REGULAR, PARTTIME, DAILY
+
+model Contract {
+  id              String    @id @default(uuid())
+  status          String    @default("DRAFT")
+  contractType    String    // REGULAR, PARTTIME, DAILY
+
+  // 고용주 정보
+  employerName    String    // 상호명
+  employerCeo     String    // 대표자명
+  employerAddress String    // 사업장 주소
+  employerPhone   String    // 연락처
+
+  // 근로자 정보
+  workerName      String    // 이름
+  workerBirth     String    // 생년월일
+  workerPhone     String    // 연락처
+  workerAddress   String    // 주소
+
+  // 근무 조건
+  startDate       DateTime  // 계약 시작일
+  endDate         DateTime? // 계약 종료일 (null이면 무기한)
+  workDays        String    // 근무 요일 JSON ["월","화","수"]
+  workStart       String    // 근무 시작 시간 "09:00"
+  workEnd         String    // 근무 종료 시간 "18:00"
+  breakTime       Int       // 휴게 시간 (분 단위)
+  hourlyWage      Int       // 시급
+  payDay          Int       // 급여 지급일 (매월 N일)
+
+  // 특약 사항
+  specialTerms    String?
+
+  // 서명 데이터 (Base64 이미지)
+  employerSign    String?
+  workerSign      String?
+
+  // 블록체인 관련
+  pdfHash         String?   // PDF SHA-256 해시
+  solanaTxId      String?   // Solana 트랜잭션 ID
+
+  // 타임스탬프
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  signedAt        DateTime? // 양측 서명 완료 시점
+}
