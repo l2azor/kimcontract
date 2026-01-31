@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "전자 근로계약서 서비스 - 블록체인 기반 계약서 작성 및 서명",
   "scripts": {
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev -- -p 3001",
@@ -15,7 +16,7 @@
   },
   "keywords": ["contract", "blockchain", "solana", "nestjs", "nextjs"],
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "concurrently": "^8.2.2"
   }
 }
