@@ -15,4 +15,4 @@ cmds = [
 ]
 
 [start]
-cmd = "npm run start"
+cmd = "cd backend && npx ts-node prisma/seed-super-admin.ts && cd .. && npm run start"
