@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "npx prisma generate && npx tsc -p tsconfig.build.json && cp -r src/pdf/fonts dist/pdf/",
+    "build": "npx prisma generate && echo '=== Starting tsc ===' && npx tsc -p tsconfig.build.json && echo '=== tsc done ===' && ls -la dist/ && cp -r src/pdf/fonts dist/pdf/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
