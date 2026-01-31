@@ -79,7 +79,7 @@ export default function ContractPage() {
     try {
       await navigator.clipboard.writeText(window.location.href);
       alert('링크가 복사되었습니다.');
-    } catch (err) {
+    } catch {
       const textArea = document.createElement('textarea');
       textArea.value = window.location.href;
       textArea.style.position = 'fixed';
@@ -90,7 +90,7 @@ export default function ContractPage() {
       try {
         document.execCommand('copy');
         alert('링크가 복사되었습니다.');
-      } catch (fallbackErr) {
+      } catch {
         alert('링크 복사에 실패했습니다. 수동으로 복사해주세요.');
       }
       document.body.removeChild(textArea);
