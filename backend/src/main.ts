@@ -22,7 +22,7 @@ async function bootstrap() {
   // API 접두사
   app.setGlobalPrefix('api');
 
-  const port = process.env.BACKEND_PORT ?? 8080;
+  const port = process.env.BACKEND_PORT ?? 3000;
   await app.listen(port);
   console.log(`Backend running on http://localhost:${port}`);
 }
