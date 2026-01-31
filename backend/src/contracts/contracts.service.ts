@@ -13,7 +13,7 @@ export class ContractsService {
   constructor(private prisma: PrismaService) {}
 
   // 계약서 생성
-  async create(dto: CreateContractDto) {
+  async create(dto: CreateContractDto, companyId?: string) {
     const contract = await this.prisma.contract.create({
       data: {
         contractType: dto.contractType,
@@ -34,6 +34,7 @@ export class ContractsService {
         hourlyWage: dto.hourlyWage,
         payDay: dto.payDay,
         specialTerms: dto.specialTerms,
+        companyId,
       },
     });
 

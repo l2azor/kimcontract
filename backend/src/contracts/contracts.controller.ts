@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, Res } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { ContractsService } from './contracts.service';
 import { CreateContractDto } from './dto/create-contract.dto';
@@ -6,6 +6,10 @@ import { SignContractDto } from './dto/sign-contract.dto';
 import { PdfService } from '../pdf/pdf.service';
 import { SolanaService } from '../solana/solana.service';
 import { FormattedContract } from './types';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { CurrentUserData } from '../auth/decorators/current-user.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('contracts')
 export class ContractsController {
@@ -15,16 +19,19 @@ export class ContractsController {
     private readonly solanaService: SolanaService,
   ) {}
 
-  // 계약서 생성
+  // 계약서 생성 (인증 필요)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Body() dto: CreateContractDto,
+    @CurrentUser() user: CurrentUserData,
   ): Promise<{ success: boolean; data: FormattedContract }> {
-    const data: FormattedContract = await this.contractsService.create(dto);
+    const data: FormattedContract = await this.contractsService.create(dto, user.companyId);
     return { success: true, data };
   }
 
-  // 계약서 조회
+  // 계약서 조회 (공개 - 근로자가 서명하기 위해 접근)
+  @Public()
   @Get(':id')
   async findOne(
     @Param('id') id: string,
@@ -33,7 +40,8 @@ export class ContractsController {
     return { success: true, data };
   }
 
-  // 고용주 서명
+  // 고용주 서명 (인증 필요)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/employer-sign')
   async employerSign(
     @Param('id') id: string,
@@ -46,7 +54,8 @@ export class ContractsController {
     return { success: true, data };
   }
 
-  // 근로자 서명 + 블록체인 기록
+  // 근로자 서명 + 블록체인 기록 (공개)
+  @Public()
   @Patch(':id/worker-sign')
   async workerSign(
     @Param('id') id: string,
@@ -70,7 +79,8 @@ export class ContractsController {
     return { success: true, data: contract };
   }
 
-  // PDF 다운로드
+  // PDF 다운로드 (공개)
+  @Public()
   @Get(':id/pdf')
   async downloadPdf(
     @Param('id') id: string,
@@ -86,7 +96,8 @@ export class ContractsController {
     res.send(pdfBuffer);
   }
 
-  // 블록체인 검증
+  // 블록체인 검증 (공개)
+  @Public()
   @Get(':id/verify')
   async verify(@Param('id') id: string) {
     const contract: FormattedContract = await this.contractsService.findOne(id);

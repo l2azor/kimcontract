@@ -9,11 +9,41 @@ datasource db {
 
 // Status: DRAFT, SENT, SIGNED, COMPLETED
 // ContractType: REGULAR, PARTTIME, DAILY
+// UserRole: COMPANY_ADMIN, COMPANY_USER
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String   // bcrypt 해시
+  role        String   @default("COMPANY_ADMIN")
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Company {
+  id              String     @id @default(uuid())
+  name            String     // 회사명
+  ceoName         String     // 대표자명
+  businessNumber  String     @unique // 사업자등록번호 (000-00-00000)
+  address         String
+  phone           String
+  status          String     @default("ACTIVE")
+  users           User[]
+  contracts       Contract[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
 
 model Contract {
   id              String    @id @default(uuid())
   status          String    @default("DRAFT")
   contractType    String    // REGULAR, PARTTIME, DAILY
+
+  // 회사 연결
+  companyId       String?
+  company         Company?  @relation(fields: [companyId], references: [id])
 
   // 고용주 정보
   employerName    String    // 상호명
