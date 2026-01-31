@@ -7,6 +7,7 @@ import {
   IsIn,
   Min,
   Max,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateContractDto {
@@ -44,6 +45,7 @@ export class CreateContractDto {
   startDate: string;
 
   @IsOptional()
+  @ValidateIf((o) => o.endDate !== '' && o.endDate !== null)
   @IsDateString()
   endDate?: string;
 

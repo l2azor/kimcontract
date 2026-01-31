@@ -83,7 +83,13 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const createRes = await contractApi.create(formData);
+      // endDate가 빈 문자열이면 제거 (무기계약)
+      const contractData = { ...formData };
+      if (!contractData.endDate || contractData.endDate === '') {
+        delete contractData.endDate;
+      }
+
+      const createRes = await contractApi.create(contractData);
       const contractId = createRes.data.id;
       await contractApi.employerSign(contractId, signature);
       alert('계약서가 생성되었습니다. 근로자에게 링크를 공유해주세요.');
@@ -98,33 +104,24 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen relative py-12 px-4">
-      {/* Geometric background elements */}
-      <div className="fixed top-20 right-10 w-64 h-64 border border-cyan-400/30 rounded-full animate-pulse" style={{ animationDuration: '4s' }} />
-      <div className="fixed bottom-20 left-10 w-48 h-48 border border-emerald-400/30 rotate-45" style={{ animation: 'float 6s ease-in-out infinite' }} />
-
-      <div className="max-w-4xl mx-auto relative z-10">
+    <main className="min-h-screen py-12 px-4 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
         {/* Hero Header */}
-        <div className="text-center mb-12 animate-fade-in" style={{ animation: 'fadeIn 0.8s ease-out' }}>
-          <div className="inline-block mb-6">
-            <div className="relative">
-              <h1 className="text-6xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent">
-                계약왕김계약
-              </h1>
-              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-70" />
-            </div>
-          </div>
-          <p className="text-xl text-white font-light tracking-wide">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            계약왕김계약
+          </h1>
+          <p className="text-lg text-gray-600 mb-4">
             블록체인으로 영원히 보존되는 디지털 근로계약
           </p>
-          <div className="mt-4 flex items-center justify-center gap-3 text-sm text-cyan-100">
+          <div className="flex items-center justify-center gap-3 text-sm text-gray-500">
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono font-semibold">Solana Mainnet</span>
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="font-medium">Solana Mainnet</span>
             </div>
-            <span className="text-cyan-300">•</span>
+            <span>•</span>
             <div className="flex items-center gap-1">
-              <span className="font-mono font-semibold">SHA-256 Verified</span>
+              <span className="font-medium">SHA-256 Verified</span>
             </div>
           </div>
         </div>
@@ -135,7 +132,7 @@ export default function Home() {
             <div className={`step-indicator ${step === 1 ? 'active' : 'completed'}`}>
               {step > 1 ? '✓' : '1'}
             </div>
-            <span className={`text-sm font-bold ${step === 1 ? 'text-cyan-300' : 'text-white'}`}>
+            <span className={`text-sm font-bold text-gray-900`}>
               계약 정보
             </span>
           </div>
@@ -144,7 +141,7 @@ export default function Home() {
             <div className={`step-indicator ${step === 2 ? 'active' : 'bg-gray-400 text-white'}`}>
               2
             </div>
-            <span className={`text-sm font-bold ${step === 2 ? 'text-cyan-300' : 'text-cyan-200'}`}>
+            <span className={`text-sm font-bold ${step === 2 ? 'text-gray-900' : 'text-gray-600'}`}>
               전자 서명
             </span>
           </div>
@@ -549,11 +546,11 @@ export default function Home() {
         </form>
 
         {/* Footer */}
-        <div className="mt-12 text-center text-sm text-cyan-200">
+        <div className="mt-12 text-center text-sm text-gray-500">
           <p className="mb-2">
             🔒 모든 데이터는 Solana 블록체인에 암호화되어 저장됩니다
           </p>
-          <p className="font-mono text-xs opacity-70">
+          <p className="text-xs text-gray-400">
             Powered by SHA-256 • Solana Mainnet
           </p>
         </div>

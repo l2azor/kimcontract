@@ -126,7 +126,7 @@ export default function ContractPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-verification-cyan/30 border-t-verification-cyan rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white font-medium">계약서 로딩 중...</p>
+          <p className="text-gray-900 font-medium">계약서 로딩 중...</p>
         </div>
       </div>
     );
@@ -155,29 +155,25 @@ export default function ContractPage() {
   const isCompleted = contract.status === 'COMPLETED';
 
   return (
-    <main className="min-h-screen relative py-12 px-4">
-      {/* Background decorations */}
-      <div className="fixed top-10 right-5 w-72 h-72 border border-emerald-400/30 rounded-full" style={{ animation: 'float 8s ease-in-out infinite' }} />
-      <div className="fixed bottom-10 left-5 w-56 h-56 border border-cyan-400/30 rotate-45" style={{ animation: 'float 10s ease-in-out infinite reverse' }} />
-
-      <div className="max-w-5xl mx-auto relative z-10">
+    <main className="min-h-screen py-12 px-4 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-3 mb-4">
             <a
               href="/"
-              className="text-white hover:text-cyan-300 transition-colors"
+              className="text-gray-700 hover:text-cyan-600 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </a>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-verification-cyan to-blockchain-green bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-gray-900">
               근로계약서
             </h1>
           </div>
           <div className="flex items-center justify-center gap-4 text-sm">
-            <span className="font-mono text-cyan-200">
+            <span className="font-mono text-gray-600">
               ID: {contract.id.slice(0, 12)}...
             </span>
             <span
@@ -226,11 +222,11 @@ export default function ContractPage() {
                   </div>
                   <div className="py-2 border-b border-glass-border">
                     <span className="text-gray-800 font-bold block mb-1">주소</span>
-                    <span className="text-crystal-white text-xs">{contract.employerAddress}</span>
+                    <span className="text-gray-900 text-xs">{contract.employerAddress}</span>
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-gray-800 font-bold">연락처</span>
-                    <span className="text-crystal-white font-mono font-semibold">{contract.employerPhone}</span>
+                    <span className="text-gray-900 font-mono font-semibold">{contract.employerPhone}</span>
                   </div>
                 </div>
               </div>
@@ -250,15 +246,15 @@ export default function ContractPage() {
                   </div>
                   <div className="flex justify-between py-2 border-b border-glass-border">
                     <span className="text-gray-800 font-bold">생년월일</span>
-                    <span className="text-crystal-white font-mono font-semibold">{contract.workerBirth}</span>
+                    <span className="text-gray-900 font-mono font-semibold">{contract.workerBirth}</span>
                   </div>
                   <div className="py-2 border-b border-glass-border">
                     <span className="text-gray-800 font-bold block mb-1">주소</span>
-                    <span className="text-crystal-white text-xs">{contract.workerAddress}</span>
+                    <span className="text-gray-900 text-xs">{contract.workerAddress}</span>
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-gray-800 font-bold">연락처</span>
-                    <span className="text-crystal-white font-mono font-semibold">{contract.workerPhone}</span>
+                    <span className="text-gray-900 font-mono font-semibold">{contract.workerPhone}</span>
                   </div>
                 </div>
               </div>
@@ -290,7 +286,7 @@ export default function ContractPage() {
               </div>
               <div className="p-4 rounded-xl bg-gray-50 border-2 border-gray-200">
                 <div className="text-xs text-gray-600 mb-1 uppercase tracking-wider font-bold">근무 시간</div>
-                <div className="text-crystal-white font-mono font-semibold">
+                <div className="text-gray-900 font-mono font-semibold">
                   {contract.workStart} - {contract.workEnd}
                 </div>
               </div>
@@ -345,7 +341,7 @@ export default function ContractPage() {
               </div>
               <div className="relative p-6 rounded-2xl bg-gray-50 border-2 border-gray-200">
                 <div className="absolute -top-3 left-6 px-3 py-1 bg-emerald-100 rounded-full border-2 border-emerald-500">
-                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">근로자</span>
+                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">근로자</span>
                 </div>
                 {contract.workerSign ? (
                   <img
@@ -364,40 +360,34 @@ export default function ContractPage() {
 
           {/* Blockchain Verification Section */}
           {isCompleted && contract.solanaTxId && (
-            <section className="p-8 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-700 border-2 border-emerald-400 relative overflow-hidden">
-              {/* Animated background */}
-              <div className="absolute inset-0 opacity-20" style={{
-                backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(0, 255, 163, 0.1) 0%, transparent 50%)',
-                animation: 'blockchainPulse 3s infinite'
-              }} />
-
-              <div className="relative z-10">
+            <section className="p-8 rounded-2xl bg-emerald-50 border-2 border-emerald-500">
+              <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-blockchain-green/50">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-emerald-400">블록체인 검증</h2>
-                    <p className="text-xs text-cyan-300 font-mono font-semibold">Solana Mainnet</p>
+                    <h2 className="text-xl font-bold text-emerald-700">블록체인 검증</h2>
+                    <p className="text-xs text-gray-600 font-semibold">Solana Mainnet</p>
                   </div>
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  <div className="p-4 rounded-xl bg-gray-800 border-2 border-gray-600">
-                    <div className="text-xs text-cyan-300 mb-2 uppercase tracking-wider font-bold">계약 해시 (SHA-256)</div>
-                    <code className="text-xs text-emerald-400 font-mono font-bold break-all block">
+                  <div className="p-4 rounded-xl bg-white border border-gray-200">
+                    <div className="text-xs text-gray-600 mb-2 uppercase tracking-wider font-bold">계약 해시 (SHA-256)</div>
+                    <code className="text-xs text-gray-900 font-mono font-semibold break-all block">
                       {contract.pdfHash}
                     </code>
                   </div>
-                  <div className="p-4 rounded-xl bg-gray-800 border-2 border-gray-600">
-                    <div className="text-xs text-cyan-300 mb-2 uppercase tracking-wider font-bold">트랜잭션 ID</div>
+                  <div className="p-4 rounded-xl bg-white border border-gray-200">
+                    <div className="text-xs text-gray-600 mb-2 uppercase tracking-wider font-bold">트랜잭션 ID</div>
                     <a
                       href={`https://solscan.io/tx/${contract.solanaTxId}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-cyan-300 hover:text-emerald-400 transition-colors font-mono text-xs break-all underline"
+                      className="text-cyan-600 hover:text-cyan-700 transition-colors font-mono text-xs break-all underline"
                     >
                       {contract.solanaTxId}
                     </a>
@@ -437,11 +427,11 @@ export default function ContractPage() {
                     }}
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`text-4xl ${verifyResult.isValid ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <div className={`text-4xl ${verifyResult.isValid ? 'text-emerald-600' : 'text-red-600'}`}>
                         {verifyResult.isValid ? '✅' : '❌'}
                       </div>
                       <div className="flex-1">
-                        <p className={`font-bold text-lg mb-3 ${verifyResult.isValid ? 'text-emerald-400' : 'text-red-400'}`}>
+                        <p className={`font-bold text-lg mb-3 ${verifyResult.isValid ? 'text-emerald-700' : 'text-red-700'}`}>
                           {verifyResult.isValid
                             ? '위변조되지 않은 원본 계약서입니다'
                             : '계약서가 위변조되었습니다!'}
@@ -537,14 +527,14 @@ export default function ContractPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-center text-sm text-cyan-200">
+        <div className="mt-12 text-center text-sm text-gray-500">
           <p className="mb-2 flex items-center justify-center gap-2">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
             블록체인 기반 위변조 방지 시스템
           </p>
-          <p className="font-mono text-xs opacity-70">
+          <p className="text-xs text-gray-400">
             Powered by Solana Mainnet • SHA-256 Hash
           </p>
         </div>
