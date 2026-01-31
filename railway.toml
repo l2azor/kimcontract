@@ -1,0 +1,12 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacks]
+nixPkgs = ["nodejs_18"]
+
+[build.env]
+NPM_CONFIG_PRODUCTION = "false"
+NODE_ENV = "development"
+
+[deploy]
+startCommand = "cd backend && npx ts-node prisma/seed-super-admin.ts; cd .. && npm run start"

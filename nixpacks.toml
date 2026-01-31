@@ -1,18 +1,24 @@
 [phases.setup]
 nixPkgs = ["nodejs_18"]
 
+[variables]
+NODE_ENV = "development"
+NPM_CONFIG_PRODUCTION = "false"
+
 [phases.install]
 cmds = [
-  "npm install --include=dev",
-  "cd backend && npm install --include=dev",
-  "cd frontend && npm install --include=dev"
+  "npm install",
+  "cd backend && npm install",
+  "cd frontend && npm install"
 ]
 
 [phases.build]
 cmds = [
   "cd backend && npx prisma generate && npx nest build",
-  "cd frontend && npm run build"
+  "cd frontend && npm run build",
+  "echo 'Build completed. Checking dist folder:'",
+  "ls -la backend/dist/ || echo 'dist folder not found'"
 ]
 
 [start]
-cmd = "cd backend && npx ts-node prisma/seed-super-admin.ts && cd .. && npm run start"
+cmd = "cd backend && npx ts-node prisma/seed-super-admin.ts; cd .. && npm run start"
