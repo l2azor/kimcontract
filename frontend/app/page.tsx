@@ -34,7 +34,7 @@ export default function Home() {
     workStart: '09:00',
     workEnd: '18:00',
     breakTime: 60,
-    hourlyWage: 9860,
+    hourlyWage: 10320,
     payDay: 10,
     specialTerms: '',
   });
