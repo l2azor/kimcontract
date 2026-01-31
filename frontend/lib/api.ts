@@ -229,6 +229,64 @@ export const adminApi = {
   },
 };
 
+// 슈퍼어드민 API
+export interface CompanyListItem {
+  id: string;
+  name: string;
+  ceoName: string;
+  businessNumber: string;
+  phone: string;
+  status: string;
+  contractCount: number;
+  userCount: number;
+  createdAt: string;
+}
+
+export interface AllContractsQuery extends ContractQuery {
+  companyId?: string;
+}
+
+export interface SuperAdminStats {
+  companies: { total: number; active: number };
+  contracts: StatsOverview;
+  users: { total: number };
+  recentCompanies: { id: string; name: string; createdAt: string }[];
+  recentContracts: { id: string; workerName: string; status: string; companyName: string; createdAt: string }[];
+}
+
+export interface ContractWithCompany extends ContractListItem {
+  company: { id: string; name: string } | null;
+}
+
+export const superAdminApi = {
+  getCompanies: async (query: { search?: string; status?: string; page?: number; limit?: number } = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') {
+        params.append(key, String(value));
+      }
+    });
+    const res = await api.get<{ success: boolean; data: { companies: CompanyListItem[]; pagination: Pagination } }>(`/super-admin/companies?${params.toString()}`);
+    return res.data;
+  },
+
+  getAllContracts: async (query: AllContractsQuery = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') {
+        params.append(key, String(value));
+      }
+    });
+    const res = await api.get<{ success: boolean; data: { contracts: ContractWithCompany[]; pagination: Pagination } }>(`/super-admin/contracts?${params.toString()}`);
+    return res.data;
+  },
+
+  getStats: async () => {
+    const res = await api.get<{ success: boolean; data: SuperAdminStats }>('/super-admin/stats');
+    return res.data;
+  },
+};
+
 export const contractApi = {
   // 계약서 생성
   create: async (data: CreateContractDto) => {

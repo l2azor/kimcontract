@@ -25,7 +25,12 @@ export default function LoginPage() {
       const response = await authApi.login(formData);
       if (response.success) {
         login(response.data.token, response.data.user, response.data.company);
-        router.push('/admin');
+        // 역할에 따라 다른 페이지로 이동
+        if (response.data.user.role === 'SUPER_ADMIN') {
+          router.push('/super-admin');
+        } else {
+          router.push('/admin');
+        }
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
