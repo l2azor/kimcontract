@@ -12,7 +12,7 @@
     "build:frontend": "cd frontend && npm run build",
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd backend && npm run start:prod",
-    "start:frontend": "cd frontend && npm run start -- -p 3001"
+    "start:frontend": "cd frontend && npm run start -- -p ${PORT:-3001}"
   },
   "keywords": ["contract", "blockchain", "solana", "nestjs", "nextjs"],
   "license": "MIT",

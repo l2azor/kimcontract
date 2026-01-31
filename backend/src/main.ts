@@ -7,12 +7,7 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: [
-      'http://localhost:3001',
-      'http://localhost:3000',
-      'http://localhost:4001',
-      'http://dev.openbuslab.com:4001',
-    ],
+    origin: true, // 모든 origin 허용 (프록시 통해 내부 통신)
     credentials: true,
   });
 
@@ -27,7 +22,7 @@ async function bootstrap() {
   // API 접두사
   app.setGlobalPrefix('api');
 
-  const port = process.env.PORT ?? 3000;
+  const port = process.env.BACKEND_PORT ?? 8080;
   await app.listen(port);
   console.log(`Backend running on http://localhost:${port}`);
 }
