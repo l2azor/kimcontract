@@ -18,9 +18,9 @@ export class SolanaService {
   private payer: Keypair;
 
   constructor(private configService: ConfigService) {
-    // Devnet 연결 (테스트용)
+    // Mainnet 연결
     this.connection = new Connection(
-      'https://api.devnet.solana.com',
+      'https://api.mainnet-beta.solana.com',
       'confirmed',
     );
 
@@ -32,7 +32,7 @@ export class SolanaService {
     this.payer = Keypair.fromSecretKey(bs58.decode(privateKey));
 
     this.logger.log(
-      `Solana Devnet 연결됨. Payer: ${this.payer.publicKey.toBase58()}`,
+      `Solana Mainnet 연결됨. Payer: ${this.payer.publicKey.toBase58()}`,
     );
   }
 
